@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+
+model ELEVE {
+  MATRICULE       String @id
+  DESIGNATION_NIVEAU String
+  NOM             String
+
+  NIVEAU          NIVEAU @relation(fields: [DESIGNATION_NIVEAU], references: [DESIGNATION_NIVEAU])
+  //POINTER         POINTER[]
+
+  @@index([DESIGNATION_NIVEAU])
+}
+
+model HORAIRE {
+  ABR_UE            String
+  ABR_PROF          String
+  DESIGNATION_SALLE String
+  DESIGNATION_NIVEAU   String
+  DATE_HORAIRE      DateTime  @db.Date    
+  HEURE_DEBUT       DateTime  @db.Time       
+  HEURE_FIN         DateTime  @db.Time
+  IS_FAIT           Boolean
+
+  UE                UE      @relation(fields: [ABR_UE], references: [ABR_UE])
+  PROF              PROF    @relation(fields: [ABR_PROF], references: [ABR_PROF])
+  SALLE             SALLE   @relation(fields: [DESIGNATION_SALLE], references: [DESIGNATION_SALLE])
+  NIVEAU          NIVEAU @relation(fields: [DESIGNATION_NIVEAU], references: [DESIGNATION_NIVEAU])
+
+  @@id([ ABR_UE,ABR_PROF,DESIGNATION_SALLE,DESIGNATION_NIVEAU])
+}
+model PROF {
+  NOM_PROF String
+  ABR_PROF String  @id
+
+  HORAIRE  HORAIRE[]
+}
+
+model UE {
+  DESIGNATION_UE String
+  ABR_UE         String  @id
+
+  HORAIRE        HORAIRE[]
+}
+
+model NIVEAU {
+  DESIGNATION_NIVEAU String @id
+  
+  ELEVE              ELEVE[]
+  HORAIRE            HORAIRE[]
+
+}
+
+
+model SALLE {
+  DESIGNATION_SALLE String @id
+
+  HORAIRE           HORAIRE[]
+  //POINTER           POINTER[]
+}
+
+// model POINTER {
+//   ID               Int    @id @default(autoincrement())
+//   MATRICULE        String @db.Char(32)
+//   DESIGNATION_SALLE String @db.Char(32)
+//   DATE_POINTER     DateTime @db.Date
+//   HEURE_POINTER      DateTime @db.Time
+//   DIRECTION        String? @db.Char(32)
+
+//   ELEVE            ELEVE   @relation(fields: [MATRICULE], references: [MATRICULE])
+//   SALLE            SALLE   @relation(fields: [DESIGNATION_SALLE], references: [DESIGNATION_SALLE])
+
+//   @@index([MATRICULE])
+//   @@index([DESIGNATION_SALLE])
+// }
+
+// model edt {
+//   id          Int       @id(map: "PK_edt") @default(autoincrement())
+//   date        DateTime  @db.Date
+//   matiere     String   @db.VarChar(255)
+//   heure_debut DateTime @db.Time
+//   heure_fin   DateTime @db.Time
+//   classe      String   @db.VarChar(255)
+// }
+
+// model etudiant {
+//   id        Int     @id(map: "PK_etudiantt") @default(autoincrement())
+//   nom       String @db.VarChar(255)
+//   matricule String @db.VarChar(20)
+//   classe    String @db.VarChar(50)
+// }
+
+// model matiere {
+//   id_matiere  Int    @id(map: "PK_matieree") @default(autoincrement())
+//   abreviation String @db.VarChar(10)
+//   nom_matiere String @db.VarChar(50)
+//   classe      String @db.VarChar(50)
+// }
+
+model pointeur {
+  id Int @id @default(autoincrement())
+  matricule String   @db.NVarChar(50)
+  dateheure DateTime @db.DateTime
+  date      DateTime @db.Date
+  heure     DateTime @db.Time
+  direction String   @db.NVarChar(50)
+  salle     String   @db.NVarChar(50)
+  SN        String   @db.NVarChar(250)
+  nom       String   @db.NVarChar(250)
+  carte     String   @db.NVarChar(250)
+
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B613C3FCB7B") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
